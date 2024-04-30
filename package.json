@@ -6,7 +6,20 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
+    "express-validator": "^7.0.1",
+    "http-status-codes": "^2.3.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.2"
+  },
+  "scripts": {
+    "setup-project": "npm i && cd client &&  npm i",
+    "setup-projection-app": "npm i && cd client &&  npm i && npm run build",
+    "dev": " nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.0"
   }
 }
