@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   VStack,
   Flex,
@@ -6,37 +6,78 @@ import {
   Box,
   Avatar,
   Menu,
-  MenuButton, 
+  MenuButton,
   MenuItem,
   MenuList,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 
 import { Link } from "react-router-dom";
 import { BsInstagram } from "react-icons/bs";
 import { CgMoreO } from "react-icons/cg";
-const Usercom = () => {
-    const toast = useToast()
-    const copyUrl =async () => {
-        const url = window.location.href;
-    navigator.clipboard.writeText(url).then(()=>{
-
+import { useRecoilValue } from "recoil";
+import userAuthState from "../Atom/userAtom";
+import customFetch from "../utils/CustomFetch";
+import { set } from "mongoose";
+const Usercom = ({ user }) => {
+  const currentuset = useRecoilValue(userAuthState);
+  const [following, setFollowing] = useState(
+    user.followers?.includes(currentuset._id)
+  );
+  const [loading, setLoading] = useState(false);
+  const toast = useToast();
+  const copyUrl = async () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      toast({
+        title: "Copied!.",
+        description: "url copied to clip board.",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    });
+  };
+  const handleFollowunfollow =async()=>{
+    if(loading)return
+    try { 
+       setLoading(true)
+      const res = await customFetch.get(`/user/follow/${user._id}`)
+      if(res.data?.success==false){
         toast({
-            title: 'Copied!.',
-            description: "url copied to clip board.",
-            status: 'success',
-            duration: 2000,
-            isClosable: true,
-          })
-    })
-   
-        
+          title: 'Error!.',
+          description: res?.data?.message,
+          status: 'error',
+          duration: 2000,
+          isClosable: true,
+        })
+        setLoading(false)
+      }
+      if(following){
+        user.followers.pop()
+      }else{
+        user.followers.push(currentuset._id)
+      }
+      setFollowing(!following)
+    } catch (error) {
+       toast({
+        title: 'Error!.',
+        description: error?.response?.data?.message||error.message,
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+
+      })
+      setLoading(false)
+    }finally{
+      setLoading(false)
     }
+  }
   return (
     <VStack gap={5} align={"start"}>
       <Flex justifyContent={"space-between"} w={"full"}>
         <Box>
-          <Text fontSize={"2xl"}>John Stantion</Text>
+          <Text fontSize={"2xl"}> {user.username}</Text>
           <Flex gap={2} alignItems={"Center"}>
             <Text fontSize={"sm"}>JohnStantion</Text>
             <Text
@@ -50,13 +91,28 @@ const Usercom = () => {
           </Flex>
         </Box>
         <Box>
-          <Avatar name="john station" src="/avatar.jpg" size={"xl"} />
+          {user.profilepic ? (
+            <Avatar name="john station" src={user.profilepic} size={"xl"} />
+          ) : (
+            <Avatar name="john station" src="/avatar.jpg" size={"xl"} />
+          )}
         </Box>
       </Flex>
-      <Text> Owner and co-founder of hsl food products and the stark </Text>
+      <Text>{user.bio} </Text>
+      {currentuset._id === user._id && (
+        <Link className="btn" to={"/update"}>
+          update
+        </Link>
+      )}
+      {currentuset._id !== user._id && (
+        <button disabled={loading} onClick={handleFollowunfollow} className="btn" to={"/update"}>
+          {  following ? "unfollow" : "follow"}
+        </button>
+      )}
+
       <Flex w={"full"} justifyContent={"space-between"}>
         <Flex gap={2} alignItems={"center"}>
-          <Text color={"gray.light"}>3.2k followers</Text>
+          <Text color={"gray.light"}>{user?.followers?.length}followers</Text>
           <Box w="1" h="1" bg={"gray.light"} borderRadius={"full"}></Box>
           <Link style={{ color: "#5c5a5a" }}>instagram.com</Link>
         </Flex>
@@ -70,19 +126,34 @@ const Usercom = () => {
                 <CgMoreO size={20} cursor={"pointer"} />
               </MenuButton>
               <MenuList bg={"gray.dark"}>
-                <MenuItem bg={"gray.dark"} onClick={copyUrl} >copy link</MenuItem>
+                <MenuItem bg={"gray.dark"} onClick={copyUrl}>
+                  copy link
+                </MenuItem>
               </MenuList>
             </Menu>
           </Box>
         </Flex>
       </Flex>
-      <Flex w={"full"} >
-          <Flex flex={"1"} justifyContent={"center"} cursor={"pointer"}  borderBottom={"1.5px solid"} pb={'3'} >
-              <Text>Threads</Text>
-          </Flex>
-          <Flex flex={"1"} justifyContent={"center"} color={"gray"} cursor={"pointer"}  borderBottom={"1px solid gray"} pb={'3'} >
-              <Text>Replies</Text>
-          </Flex>
+      <Flex w={"full"}>
+        <Flex
+          flex={"1"}
+          justifyContent={"center"}
+          cursor={"pointer"}
+          borderBottom={"1.5px solid"}
+          pb={"3"}
+        >
+          <Text>Threads</Text>
+        </Flex>
+        <Flex
+          flex={"1"}
+          justifyContent={"center"}
+          color={"gray"}
+          cursor={"pointer"}
+          borderBottom={"1px solid gray"}
+          pb={"3"}
+        >
+          <Text>Replies</Text>
+        </Flex>
       </Flex>
     </VStack>
   );

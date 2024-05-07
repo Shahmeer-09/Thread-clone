@@ -37,6 +37,7 @@ module.exports.createPostValidation = validateFunc([
   body("postedBy").notEmpty().withMessage("please provide some text"),
   body("text")
     .notEmpty()
-    .withMessage("password is required")
+    .withMessage("Porvide some Text to post")
 ]);
+
     

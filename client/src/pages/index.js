@@ -1,5 +1,0 @@
-export {default as Layout} from './Layout'
-export {default as Postpage} from './Postpage'
-export {default as Userpage} from './Userpage'
-export {default as Homepage} from './Homepage'
-export {default as Authpage} from './Authpage'

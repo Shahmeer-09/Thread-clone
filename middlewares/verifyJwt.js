@@ -1,26 +1,20 @@
 const jwt = require("jsonwebtoken");
-const User = require("..//models/user.model");
 const { unauthenticatedError } = require("../utils/customerrors");
+const { StatusCodes } = require("http-status-codes");
 
 const verifyuser = async (req, res, next) => {
   try {
     const token = req.cookies.token;
 
-    if (!token) { 
-      throw new unauthenticatedError("Authentication invalid");
-    }
+    if (!token)
+      throw new unauthenticatedError("Authentication invalid token expires");
 
-    const decoded =jwt.verify(token, process.env.ACCESS_JWT_SECRET);
-
-    const user = await User.findOne({ _id: decoded._id }).select("-password");
-   
-    if (!user) {
-      throw new unauthenticatedError("Authentication invalid");
-    }
-    req.user = user;
+    const decoded = jwt.verify(token, process.env.ACCESS_JWT_SECRET);
+    req.user = decoded;
     next();
   } catch (error) {
-    throw new unauthenticatedError("Authentication invalid try again!");
+    res.status(StatusCodes.UNAUTHORIZED).json({ message: error.message, statusCode:StatusCodes.UNAUTHORIZED });
+    console.log("Error in authentication: ", error.message);
   }
 };
 

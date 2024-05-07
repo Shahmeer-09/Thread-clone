@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    porfilepublic: {
+      type: String,
+      default:"",
+    },
     followers: {
       type: [String],
       default: [],

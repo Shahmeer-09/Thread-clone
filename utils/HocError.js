@@ -1,6 +1,10 @@
-const AsyncError = (reqhandler)=>{
-    return (req, res, next)=>{
-        Promise.resolve(reqhandler(req, res , next)).catch(err=>next(err))
-    }
+const AsyncError = (reqhandler)=> async (req, res, next)=> {
+     try {
+        await reqhandler(req, res, next)
+     } catch (error) {
+        next(error)
+     }
 }
 module.exports = AsyncError
+
+

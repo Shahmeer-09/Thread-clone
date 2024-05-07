@@ -6,6 +6,7 @@ import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { ColorModeScript } from "@chakra-ui/react";
 import { mode } from "@chakra-ui/theme-tools";
 import { RecoilRoot } from "recoil";
+import { ToastContainer } from "react-toastify";
 const styles = {
   global: (props) => ({
     body: {
@@ -33,6 +34,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <ColorModeScript initialColorMode={theme.config.initialColorMode} />
         <App />
       </ChakraProvider>
+        <ToastContainer position="top-right" />
     </RecoilRoot>
   </React.StrictMode>
 );

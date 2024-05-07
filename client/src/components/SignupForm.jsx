@@ -13,19 +13,50 @@ import {
     Text,
     useColorModeValue,
     Link,
+    useToast
   } from '@chakra-ui/react';
   import { useState } from 'react';
   import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
-  import { useSetRecoilState } from 'recoil';
+  import { useRecoilState, useSetRecoilState } from 'recoil';
   import authScreen  from '../Atom/authAtoms';
  
 import { Form } from 'react-router-dom';
-
+import customFetch from '../utils/CustomFetch';
+  
 
   export default function SignupCard() {
+    const toast = useToast()
+    const [signState, setSignState] = useState({
+      name: "",
+      username: "",
+      email: "",
+      password: "",
+    })
     const [showPassword, setShowPassword] = useState(false);
     const setauthScreen =   useSetRecoilState(authScreen)
-  
+   const handleSignup =async ()=>{
+      try {
+         const response= await customFetch.post('/user/signup', signState)
+         toast({
+          title: 'success!.',
+          description: `${response?.data?.message}. Now please login `,
+          status:"success",
+          duration: 2000,
+          isClosable: true,
+        }) 
+         setauthScreen(true)
+
+      } catch (error) {
+        toast({
+          title: 'Error!.',
+          description: error.response?.data?.message,
+          status:"error",
+          duration: 2000,
+          isClosable: true,
+        }) 
+        return
+      }
+   }
     return (
 
       <Flex
@@ -52,24 +83,31 @@ import { Form } from 'react-router-dom';
                 <Box>
                   <FormControl isRequired>
                     <FormLabel>Full Name</FormLabel>
-                    <Input type="text" name='name'/>
+                    <Input type="text"
+                    onChange={(e)=> setSignState({ ...signState, name:e.target.value }) }
+        />
                   </FormControl>
                 </Box>
                 <Box>
                   <FormControl  isRequired >
                     <FormLabel>Username</FormLabel>
-                    <Input type="text" name='username' />
+                    <Input type="text"  
+                     onChange={(e)=> setSignState({ ...signState, username:e.target.value }) }
+    />
                   </FormControl>
                 </Box>
               </HStack>
               <FormControl id="email" isRequired>
                 <FormLabel>Email address</FormLabel>
-                <Input type="email" name='email' />
+                <Input type="email" 
+                 onChange={(e)=> setSignState({ ...signState, email:e.target.value }) } />
               </FormControl>
               <FormControl id="password" isRequired>
                 <FormLabel>Password</FormLabel>
                 <InputGroup>
-                  <Input name='password' type={showPassword ? 'text' : 'password'} />
+                  <Input name='password' type={showPassword ? 'text' : 'password'}
+                   onChange={(e)=> setSignState({ ...signState, password:e.target.value }) }
+     />
                   <InputRightElement h={'full'}>
                     <Button
                       variant={'ghost'}
@@ -77,13 +115,14 @@ import { Form } from 'react-router-dom';
                         setShowPassword((showPassword) => !showPassword)
                       }>
                       {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+
                     </Button>
                   </InputRightElement>
                 </InputGroup>
               </FormControl>
               <Stack spacing={10} pt={2}>
                 <Button
-                type='submit'
+                  onClick={handleSignup}
                   loadingText="Submitting"
                   size="lg"
                   bg={useColorModeValue('gray.600',"gray.700" )}

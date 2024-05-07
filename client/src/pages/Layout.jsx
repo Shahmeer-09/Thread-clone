@@ -1,19 +1,27 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "../components/Header";
-import customFetch from "../utils/CustomFetch";
-import { useNavigate } from "react-router-dom";
+import { Container } from "@chakra-ui/react";
+import Logoutbtn from "../components/Logoutbtn";
+import { useRecoilValue } from "recoil";
+import userAuthState from "../Atom/userAtom";
+import Createpost from "../components/Createpost";
+import Loading from "../components/Loading";
+
+
 const Layout = () => {
-  const navigate = useNavigate()
-  customFetch.interceptors.response.use((response) => response, (error)=>{
-    if(error?.response?.status === 401){
-       navigate('/auth')
-    }
-  })
+  const current = useRecoilValue(userAuthState);
+ 
   return (
     <>
-      <Header/>
-      <Outlet />
+      <Header />
+      <Logoutbtn />
+      <Container maxW={"640px"}>
+        <Suspense fallback={<Loading />}>
+          <Outlet />
+        </Suspense>
+      </Container>
+      {current && <Createpost />}
     </>
   );
 };

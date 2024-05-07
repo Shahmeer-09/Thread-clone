@@ -1,30 +1,42 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Authpage, Homepage, Layout, Postpage, Userpage } from "./pages/index";
-import { Container } from "@chakra-ui/react";
-import {action as signupAction} from './pages/Authpage'
+import { lazy } from "react";
+import Layout from "./pages/Layout";
+const Authpage = lazy(() => import('./pages/Authpage'));
+const Homepage = lazy(() => import('./pages/Homepage'));
+const Postpage = lazy(() => import('./pages/Postpage'));
+const Userpage = lazy(() => import('./pages/Userpage'));
+const Update = lazy(() => import('./pages/Update'));
+import Private from "./components/Pirvate";
 const router = createBrowserRouter([
   {
     path: "/",
-    element:<Layout/>,
+    element: <Layout />,
     children: [
       {
-        index:true,
-        element: <Homepage />,
-      
+        element: <Private />,
+        children: [
+          {
+             index: true,
+            element: <Homepage />,
+          },
+          {
+             path:"update",
+            element: <Update/>,
+          },
+        ],
       },
       {
-         path:"/auth",
-         element: <Authpage/>,
-         action: signupAction
+        path: "/auth",
+        element: <Authpage />,
       },
+
       {
         path: ":username",
         element: <Userpage />,
-        
       },
       {
-        path: ":username/post/:pid",
+        path: "username/post/:pid",
         element: <Postpage />,
       },
     ],
@@ -32,9 +44,9 @@ const router = createBrowserRouter([
 ]);
 const App = () => {
   return (
-    <Container maxW="620px">
+    <>
       <RouterProvider router={router} />
-    </Container>
+    </>
   );
 };
 

@@ -2,12 +2,13 @@ require('dotenv').config()
 const cookieParser = require('cookie-parser')
 const {connectDb} = require('./config/connectDb')
 const express = require('express')
+const bodyParser = require('body-parser')
 const { StatusCodes } = require('http-status-codes')
-const errorManager = require('./middlewares/errormanager')
+const {errorManager} = require('./middlewares/errormanager')
 const app = express()
 
 
-
+app.use(bodyParser.json({ limit: '10mb' }));
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use(cookieParser())

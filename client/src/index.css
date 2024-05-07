@@ -10,3 +10,17 @@
 .icons-container:hover{
     background-color: rgb(100, 99, 99);
 }
+
+.btn{
+    padding: 5px 15px ;
+    margin-left: 2rem;
+    background-color: rgb(30, 29, 29);
+    color: rgb(208, 207, 207);
+    font-size: medium;
+    border-radius: 5px;
+    transition: all .1s ease;
+
+    &:hover{
+        background-color: rgb(46, 45, 45);
+    }
+}
