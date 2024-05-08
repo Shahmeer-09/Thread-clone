@@ -2,6 +2,7 @@ import axios from "axios";
 const customFetch = axios.create({
   baseURL: `/thread`,
 });
+export default customFetch;
 customFetch.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -16,4 +17,3 @@ customFetch.interceptors.response.use(
   }
 );
 
-export default customFetch;

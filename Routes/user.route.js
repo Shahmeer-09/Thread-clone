@@ -5,7 +5,7 @@ const {signup, login, logout, follow, updateUser, getUserprofile, getUser} =requ
 const verifyuser = require('../middlewares/verifyJwt')
 
 router.get('/current', verifyuser, getUser)
-router.get('/Profile/:username',getUserprofile )
+router.get('/Profile/:param',getUserprofile )
 router.post('/signup',regValidation,signup )
 router.post('/login',loginValidation,login )
 router.get('/logout',logout )

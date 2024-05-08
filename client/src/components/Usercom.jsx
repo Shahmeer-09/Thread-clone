@@ -18,7 +18,6 @@ import { CgMoreO } from "react-icons/cg";
 import { useRecoilValue } from "recoil";
 import userAuthState from "../Atom/userAtom";
 import customFetch from "../utils/CustomFetch";
-import { set } from "mongoose";
 const Usercom = ({ user }) => {
   const currentuset = useRecoilValue(userAuthState);
   const [following, setFollowing] = useState(

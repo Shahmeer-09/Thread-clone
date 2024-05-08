@@ -37,6 +37,7 @@ const postSchema = new mongoose.Schema(
 				},
 				userProfilePic: {
 					type: String,
+					default: "",
 				},
 				username: {
 					type: String,

@@ -5,6 +5,7 @@ const { badReqError } = require("../utils/customerrors");
 const Uploadoncloudinary = require("../utils/Uploadoncloudinary");
 const AsyncError = require("../utils/HocError");
 const { v2: cloudinary } = require("cloudinary");
+const { default: mongoose } = require("mongoose");
 const getUser = AsyncError(async (req, res) => {
   const userID = req.user._id;
   const user = await User.findById(userID).select("-password");
@@ -74,10 +75,10 @@ const follow = AsyncError(async (req, res) => {
   const currentUser = await User.findById(req.user._id);
   if (id == req.user._id) throw new badReqError("you can't follow yourself");
 
-  if ( !usertoMoidfy || !currentUser) throw new badReqError("user not found");
+  if (!usertoMoidfy || !currentUser) throw new badReqError("user not found");
 
   const isFollowing = currentUser?.following?.includes(id);
-console.log(isFollowing)
+  console.log(isFollowing);
   if (isFollowing) {
     await User.findByIdAndUpdate(req.user._id, { $pull: { following: id } });
     await User.findByIdAndUpdate(id, { $pull: { followers: req.user._id } });
@@ -89,12 +90,12 @@ console.log(isFollowing)
     await User.findByIdAndUpdate(id, { $push: { followers: req.user._id } });
     res
       .status(StatusCodes.OK)
-      .json(new ApiResponse(StatusCodes.OK, null," follow successfully"));
+      .json(new ApiResponse(StatusCodes.OK, null, " follow successfully"));
   }
 });
 
 const updateUser = AsyncError(async (req, res) => {
-  const newUser = {...req.body};
+  const newUser = { ...req.body };
   const userid = req.user._id;
   const user = await User.findById(userid);
   if (!user) throw new badReqError("user not found");
@@ -118,12 +119,20 @@ const updateUser = AsyncError(async (req, res) => {
 });
 
 const getUserprofile = AsyncError(async (req, res) => {
-  const { username } = req.params;
-  const user = await User.findOne({username}).select("-password -updatedAt");
+  const {param} = req.params;
+
+  let user;
+  if ( mongoose.Types.ObjectId.isValid(param)) {
+    user = await User.findOne({ _id: param }).select("-password -updatedAt");
+  } else {
+    user = await User.findOne({ username: param }).select(
+      "-password -updatedAt"
+    );
+  }
   if (!user) throw new badReqError("user not found");
   res
     .status(StatusCodes.OK)
-    .json(new ApiResponse(StatusCodes.OK, user,"user found" ));
+    .json(new ApiResponse(StatusCodes.OK, user, "user found"));
 });
 module.exports = {
   signup,
