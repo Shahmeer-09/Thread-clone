@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useToast } from "@chakra-ui/react";
-import Actualpost from "../components/Actualpost";
+const Actualpost = React.lazy(() => import("../components/Actualpost"));
 import customFetch from "../utils/CustomFetch";
-
+import { Suspense } from "react";
+import Loading from "../components/Loading";
 const Homepage = () => {
   const toast = useToast();
   const [feeds, setfeeds] = useState([]);
@@ -38,14 +39,18 @@ const Homepage = () => {
     };
     getFeeds();
   }, []);
-  console.log(feeds);
   return (
+  
     <>
-      {feeds.length === 0 && <h3>Follow people to see their feeds</h3>}
-      {feeds.map((feed) => (
-        <>
+    {
+      loading && <Loading/>
+    }
+      {!loading && feeds.length === 0 && (
+        <h3>Follow people to see their feeds</h3>
+      )}
+
+      {!loading&& feeds.map((feed) => (
         <Actualpost key={feed._id} feed={feed} postedBy={feed.postedBy} />
-        </>
       ))}
     </>
   );

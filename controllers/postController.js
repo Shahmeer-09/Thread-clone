@@ -5,6 +5,7 @@ const { badReqError, unauthorizedError } = require("../utils/customerrors");
 const ApiResponse = require("../utils/Apiresponse");
 const { StatusCodes } = require("http-status-codes");
 const Uploadoncloudinary = require('../utils/Uploadoncloudinary')
+const {v2:cloudinary} = require('cloudinary')
 const createPost = AsyncError(async (req, res) => {
   const newpost = { ...req.body };
   const user = await User.findById(newpost.postedBy);
@@ -35,6 +36,9 @@ const deletPost = AsyncError(async (req, res) => {
   if (!post) throw new badReqError("Post not found");
   if (post.postedBy.toString() !== req.user._id.toString())
     throw new unauthorizedError("User not authorized");
+  if(post.imgpublicId){
+    await  cloudinary.uploader.destroy(post.imgpublicId)
+  }
   await Post.findByIdAndDelete(req.params.id);
   res
     .status(StatusCodes.OK)

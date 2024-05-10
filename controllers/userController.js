@@ -6,6 +6,7 @@ const Uploadoncloudinary = require("../utils/Uploadoncloudinary");
 const AsyncError = require("../utils/HocError");
 const { v2: cloudinary } = require("cloudinary");
 const { default: mongoose } = require("mongoose");
+const Post = require('../models/post.model')
 const getUser = AsyncError(async (req, res) => {
   const userID = req.user._id;
   const user = await User.findById(userID).select("-password");
@@ -134,6 +135,14 @@ const getUserprofile = AsyncError(async (req, res) => {
     .status(StatusCodes.OK)
     .json(new ApiResponse(StatusCodes.OK, user, "user found"));
 });
+const getPost = AsyncError(async (req, res)=>{
+ 
+  const {username} = req.params
+  const user = await User.findOne({username})
+  if(!user) throw new badReqError("User not found")
+    const posts = await Post.find({postedBy:user._id}).sort("-createdAt")
+    res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, posts, "posts retrieved"))
+})
 module.exports = {
   signup,
   login,
@@ -142,4 +151,6 @@ module.exports = {
   updateUser,
   getUserprofile,
   getUser,
+  getPost
 };
+

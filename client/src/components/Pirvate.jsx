@@ -5,9 +5,7 @@ import { Navigate, Outlet } from "react-router-dom";
 const Pirvate = () => {
   const user = useRecoilValue(userAuthState);
   if (user) {
-    return (
-        <Outlet />
-    )
+    return <Outlet />;
   } else {
     return <Navigate to={"/auth"} />;
   }

@@ -5,11 +5,14 @@ import { useToast } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import customFetch from "../utils/CustomFetch";
 import Loading from "../components/Loading";
+import Actualpost from "../components/Actualpost";
 
 const Userpage = () => {
   const { username } = useParams();
   const [user, setuser] = useState("");
   const [loading, setloading] = useState(false);
+  const [post, setpost] = useState([])
+  const [fetchin, setFetching] = useState(false)
   const toast = useToast();
   useEffect(() => {
     const getuser = async () => {
@@ -40,8 +43,40 @@ const Userpage = () => {
         setloading(false);
       }
     };
+    const getPost =async ()=>{
+       try {
+        setFetching(true)
+         const res =await  customFetch.get(`/user/userposts/${username}`)
+         const data = res?.data?.data
+         if(res.data?.success===false){
+          toast({
+            title: "Error!.",
+            description: data?.data?.message,
+            status: "error",
+            duration: 2000,
+            isClosable: true,
+          });
+          setFetching(false)
+          setpost([])
+         }
+         setFetching(false)
+         setpost(data)
+       } catch (error) {
+        toast({
+          title: "Error!.",
+          description: error?.response?.data?.message|| error.message,
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+        setFetching(false)
+        setpost([])
+       }
+    }
     getuser();
+    getPost()
   }, [username]);
+ 
   return (
     <>
       {loading && <Loading />}
@@ -51,28 +86,17 @@ const Userpage = () => {
       {!loading && user && (
         <>
           <Usercom user={user} />
-          <Post
-            likes={35}
-            replies={120}
-            postimage={"/post1.jpg"}
-            posttitle="this is what it is"
-          />
-          <Post
-            likes={45}
-            replies={430}
-            postimage={"/post2.jpg"}
-            posttitle="the tranquile of conspire"
-          />
-          <Post
-            likes={25}
-            replies={220}
-            postimage={"/post3.jpg"}
-            posttitle="One of the modest design"
-          />
+          {fetchin && <Loading/>}
+          {!fetchin && post.length===0 && <h3>this user has no posts</h3> }
+          {!fetchin && post.length!==0 && 
+              post.map(ps=>(
+                <Actualpost key={ps._id} feed={ps} postedBy={ps.postedBy} />
+              ))
+          }
         </>
       )}
     </>
   );
 };
 
-export default Userpage;
+export default Userpage

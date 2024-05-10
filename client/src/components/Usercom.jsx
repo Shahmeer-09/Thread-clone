@@ -21,7 +21,7 @@ import customFetch from "../utils/CustomFetch";
 const Usercom = ({ user }) => {
   const currentuset = useRecoilValue(userAuthState);
   const [following, setFollowing] = useState(
-    user.followers?.includes(currentuset._id)
+    user.followers?.includes(currentuset?._id)
   );
   const [loading, setLoading] = useState(false);
   const toast = useToast();
@@ -55,7 +55,7 @@ const Usercom = ({ user }) => {
       if(following){
         user.followers.pop()
       }else{
-        user.followers.push(currentuset._id)
+        user.followers.push(currentuset?._id)
       }
       setFollowing(!following)
     } catch (error) {
@@ -91,19 +91,19 @@ const Usercom = ({ user }) => {
         </Box>
         <Box>
           {user.profilepic ? (
-            <Avatar name="john station" src={user.profilepic} size={"xl"} />
+            <Avatar  src={user.profilepic} size={"xl"} />
           ) : (
-            <Avatar name="john station" src="/avatar.jpg" size={"xl"} />
+            <Avatar  src="/avatar.jpg" size={"xl"} />
           )}
         </Box>
       </Flex>
       <Text>{user.bio} </Text>
-      {currentuset._id === user._id && (
+      {currentuset?._id === user._id && (
         <Link className="btn" to={"/update"}>
           update
         </Link>
       )}
-      {currentuset._id !== user._id && (
+      {currentuset?._id !== user._id && (
         <button disabled={loading} onClick={handleFollowunfollow} className="btn" to={"/update"}>
           {  following ? "unfollow" : "follow"}
         </button>

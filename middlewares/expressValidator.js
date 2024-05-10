@@ -39,5 +39,8 @@ module.exports.createPostValidation = validateFunc([
     .notEmpty()
     .withMessage("Porvide some Text to post")
 ]);
+module.exports.commentValidation = validateFunc([
+  body("text").notEmpty().withMessage("please provide some text"),
+]);
 
     

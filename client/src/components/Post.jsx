@@ -72,10 +72,10 @@ const Post = ({likes, replies, postimage, posttitle}) => {
           >
             <Image src={postimage} w={"full"} />
           </Box>
-
+{/* 
           <Flex gap={3} my={1}>
             <Action liked={liked} setLiked={setLiked} />
-          </Flex>
+          </Flex> */}
 
         <Flex gap={2} alignItems={"center"} >
           <Text color={"gray.light"}  fontSize={"sm"} >{likes + (liked? 1: 0) } likes </Text>
