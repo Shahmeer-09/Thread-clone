@@ -17,11 +17,16 @@ import Comments from "../components/Comments";
 import Loading from "../components/Loading";
 import customFetch from "../utils/CustomFetch";
 import Action from "../components/Action";
+import {FaTrashAlt} from "react-icons/fa"
+import { useRecoilValue } from "recoil";
+import userAuthState from "../Atom/userAtom";
+import { useNavigate } from "react-router-dom";
 const Postpage = () => {
   const { user, loading } = getUserbyname();
   const [post, setpost] = useState([]);
-
+  const current =   useRecoilValue(userAuthState)
   const toast = useToast();
+  const navigate = useNavigate();
   const { pid } = useParams();
   useEffect(() => {
     const GetPost = async () => {
@@ -51,11 +56,47 @@ const Postpage = () => {
     };
     GetPost();
   },[pid]);
-  console.log(post);
+  console.log(post)
+  const handleDel = async()=>{
+    try {
+      if (!window.confirm(" Do you realy want to delete?  ")) {
+        return;
+      }
+      const res = await customFetch.delete(`/post/deletePost/${post?._id}`);
+      if (res.data.success == false) {
+        toast({
+          title: "Error!.",
+          description: res.data?.message,
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      navigate(`/${user.username}`)
+        
+      }
+      toast({
+        title: "success!.",
+        description: res.data?.message,
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+      navigate(`/${user.username}`)
+    } catch (error) {
+      toast({
+        title: "Error!.",
+        description: error.response?.data?.message || error?.message,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+  }
+
   return (
     <>
       {loading && !user && <Loading />}
-      { !loading && user&& post && 
+      { !loading &&user&& post && 
         <>
           <Flex>
             <Flex w={"full"} alignItems={"center"} gap={3}>
@@ -73,6 +114,10 @@ const Postpage = () => {
                 color={"gray.light"}
               ></Text>
             </Flex>
+           {
+            current?._id === user._id &&
+            <FaTrashAlt cursor={"pointer"} fontSize={"16px"} onClick={handleDel} />
+           }
           </Flex>
 
           <Text fontSize={"sm"} my={3}>
@@ -104,7 +149,7 @@ const Postpage = () => {
           </Flex>
           <Divider my={2} />
           {
-            post.replies.map((reply) => (
+            post?.replies?.map((reply) => (
               <Comments key={reply._id} reply={reply} lastReply={reply._id === post.replies[post.replies.length -1]._id } />
             ))
           }

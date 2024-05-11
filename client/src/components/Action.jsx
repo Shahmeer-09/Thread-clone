@@ -20,7 +20,7 @@ import {
 const Action = ({ feed }) => {
   const toast = useToast();
   const user = useRecoilValue(userAuthState);
-  const [liked, setLiked] = useState(feed.likes.includes(user?._id));
+  const [liked, setLiked] = useState(feed.likes?.includes(user?._id));
   const [isliking, setLiking] = useState(false);
   const [replying, setreplying] = useState(false);
   const [text, setreply] = useState("");
@@ -47,7 +47,6 @@ const Action = ({ feed }) => {
       } else {
         feed.likes.push(user._id);
       }
-      console.log(feed.likes);
       setLiked(!liked);
       setLiking(false);
     } catch (error) {
