@@ -36,7 +36,7 @@ const router = createBrowserRouter([
         element: <Userpage />,
       },
       {
-        path: "username/post/:pid",
+        path: ":username/post/:pid",
         element: <Postpage />,
       },
     ],

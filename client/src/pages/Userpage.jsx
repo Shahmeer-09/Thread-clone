@@ -1,48 +1,18 @@
 import React, { useEffect, useState } from "react";
 import Usercom from "../components/Usercom";
-import Post from "../components/Post";
 import { useToast } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import customFetch from "../utils/CustomFetch";
 import Loading from "../components/Loading";
 import Actualpost from "../components/Actualpost";
-
+import getUserbyname from "../hooks/getUserbyname";
 const Userpage = () => {
-  const { username } = useParams();
-  const [user, setuser] = useState("");
-  const [loading, setloading] = useState(false);
+  const {username}= useParams()
+   const {user, loading} = getUserbyname()
   const [post, setpost] = useState([])
   const [fetchin, setFetching] = useState(false)
   const toast = useToast();
   useEffect(() => {
-    const getuser = async () => {
-      try {
-        setloading(true);
-        const res = await customFetch.get(`/user/Profile/${username}`);
-        const data = res?.data?.data;
-        if (res?.data?.success === false) {
-          toast({
-            title: "Error!.",
-            description: data?.data?.message,
-            status: "error",
-            duration: 2000,
-            isClosable: true,
-          });
-          setloading(false);
-        }
-        setloading(false);
-        setuser(data);
-      } catch (error) {
-        toast({
-          title: "Error!.",
-          description: error?.response?.data?.message,
-          status: "error",
-          duration: 2000,
-          isClosable: true,
-        });
-        setloading(false);
-      }
-    };
     const getPost =async ()=>{
        try {
         setFetching(true)
@@ -51,7 +21,7 @@ const Userpage = () => {
          if(res.data?.success===false){
           toast({
             title: "Error!.",
-            description: data?.data?.message,
+            description: res.data?.message,
             status: "error",
             duration: 2000,
             isClosable: true,
@@ -73,7 +43,6 @@ const Userpage = () => {
         setpost([])
        }
     }
-    getuser();
     getPost()
   }, [username]);
  
