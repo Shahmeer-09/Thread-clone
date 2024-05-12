@@ -17,14 +17,15 @@ import Comments from "../components/Comments";
 import Loading from "../components/Loading";
 import customFetch from "../utils/CustomFetch";
 import Action from "../components/Action";
-import {FaTrashAlt} from "react-icons/fa"
-import { useRecoilValue } from "recoil";
+import { FaTrashAlt } from "react-icons/fa";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAuthState from "../Atom/userAtom";
 import { useNavigate } from "react-router-dom";
+import postAtom from "../Atom/postAtom";
 const Postpage = () => {
   const { user, loading } = getUserbyname();
-  const [post, setpost] = useState([]);
-  const current =   useRecoilValue(userAuthState)
+  const [post, setpost] = useRecoilState(postAtom);
+  const current = useRecoilValue(userAuthState);
   const toast = useToast();
   const navigate = useNavigate();
   const { pid } = useParams();
@@ -42,8 +43,8 @@ const Postpage = () => {
             isClosable: true,
           });
         }
-  
-        setpost(data);
+
+        setpost([data]);
       } catch (error) {
         toast({
           title: "Error!.",
@@ -55,9 +56,9 @@ const Postpage = () => {
       }
     };
     GetPost();
-  },[pid]);
-  console.log(post)
-  const handleDel = async()=>{
+  }, [pid]);
+  console.log(post);
+  const handleDel = async () => {
     try {
       if (!window.confirm(" Do you realy want to delete?  ")) {
         return;
@@ -71,8 +72,7 @@ const Postpage = () => {
           duration: 2000,
           isClosable: true,
         });
-      navigate(`/${user.username}`)
-        
+        navigate(`/${user.username}`);
       }
       toast({
         title: "success!.",
@@ -81,7 +81,7 @@ const Postpage = () => {
         duration: 2000,
         isClosable: true,
       });
-      navigate(`/${user.username}`)
+      navigate(`/${user.username}`);
     } catch (error) {
       toast({
         title: "Error!.",
@@ -91,12 +91,16 @@ const Postpage = () => {
         isClosable: true,
       });
     }
-  }
+  };
+  console.log(post[0]);
+  const currentpost = post[0];
 
+  if (!currentpost) return;
+  console.log(currentpost.replies);
   return (
     <>
       {loading && !user && <Loading />}
-      { !loading &&user&& post && 
+      {!loading && user && post && (
         <>
           <Flex>
             <Flex w={"full"} alignItems={"center"} gap={3}>
@@ -114,14 +118,17 @@ const Postpage = () => {
                 color={"gray.light"}
               ></Text>
             </Flex>
-           {
-            current?._id === user._id &&
-            <FaTrashAlt cursor={"pointer"} fontSize={"16px"} onClick={handleDel} />
-           }
+            {current?._id === user._id && (
+              <FaTrashAlt
+                cursor={"pointer"}
+                fontSize={"16px"}
+                onClick={handleDel}
+              />
+            )}
           </Flex>
 
           <Text fontSize={"sm"} my={3}>
-            {post.text}
+            {currentpost.text}
           </Text>
 
           <Box
@@ -130,12 +137,12 @@ const Postpage = () => {
             border={"1px solid"}
             borderColor={"gray.light"}
           >
-            <Image src={post.img} w={"full"} />
+            <Image src={currentpost.img} w={"full"} />
           </Box>
 
           <Flex gap={3} my={1}>
-        <Action  feed={post} />
-      </Flex>
+            <Action feed={currentpost} />
+          </Flex>
           <Divider my={2} />
           <Flex gap={3} justify={"space-between"}>
             <Flex alignItems={"center"} gap={2}>
@@ -148,13 +155,18 @@ const Postpage = () => {
             <Button>Get</Button>
           </Flex>
           <Divider my={2} />
-          {
-            post?.replies?.map((reply) => (
-              <Comments key={reply._id} reply={reply} lastReply={reply._id === post.replies[post.replies.length -1]._id } />
-            ))
-          }
+          {currentpost?.replies?.map((reply) => (
+            <Comments
+              key={reply._id}
+              reply={reply}
+              lastReply={
+                reply._id ===
+                currentpost.replies[currentpost.replies?.length - 1]._id
+              }
+            />
+          ))}
         </>
-      }
+      )}
     </>
   );
 };

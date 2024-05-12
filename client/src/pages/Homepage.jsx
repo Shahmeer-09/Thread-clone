@@ -4,14 +4,17 @@ const Actualpost = React.lazy(() => import("../components/Actualpost"));
 import customFetch from "../utils/CustomFetch";
 import { Suspense } from "react";
 import Loading from "../components/Loading";
+import { useRecoilState } from "recoil";
+import postAtom from "../Atom/postAtom";
 const Homepage = () => {
   const toast = useToast();
-  const [feeds, setfeeds] = useState([]);
+  const [feeds, setfeeds] = useRecoilState(postAtom);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     const getFeeds = async () => {
       try {
         setLoading(true);
+        setfeeds([])
         const response = await customFetch("/post/getFeed");
         const data = response?.data?.data;
         setfeeds(data);

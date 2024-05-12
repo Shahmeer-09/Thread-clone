@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Flex, Box, Text, useToast } from "@chakra-ui/react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAuthState from "../Atom/userAtom";
 import customFetch from "../utils/CustomFetch";
 import {
@@ -16,11 +16,13 @@ import {
   Input,
   Button,
 } from "@chakra-ui/react";
+import postAtom from "../Atom/postAtom";
 
 const Action = ({ feed }) => {
   const toast = useToast();
   const user = useRecoilValue(userAuthState);
   const [liked, setLiked] = useState(feed.likes?.includes(user?._id));
+  const [posts, setposts] = useRecoilState(postAtom)
   const [isliking, setLiking] = useState(false);
   const [replying, setreplying] = useState(false);
   const [text, setreply] = useState("");
@@ -43,9 +45,21 @@ const Action = ({ feed }) => {
         setLiking(false);
       }
       if (liked) {
-        feed.likes.pop();
+         const updatelike=posts.map(post=>{
+          if(post._id === feed._id){
+            return {...post, likes:post.likes.filter(like=>like !== user._id)}
+          }
+          return post
+         })
+         setposts(updatelike)
       } else {
-        feed.likes.push(user._id);
+         const updatelike = posts.map(post=>{
+          if(post._id === feed._id){
+            return {...post, likes:[ user._id, ...post.likes, ]}
+          }
+          return post
+         })
+       setposts(updatelike)
       }
       setLiked(!liked);
       setLiking(false);
@@ -66,6 +80,7 @@ const Action = ({ feed }) => {
 		setreplying(true)
       const res = await customFetch.post(`/post/reply/${feed._id}`, { text });
       const data = res.data?.data;
+      console.log(data)
       if (res?.data?.success === false) {
         toast({
           title: "Error",
@@ -76,13 +91,15 @@ const Action = ({ feed }) => {
         });
 		setreplying(false)
       }
-	  setLiking(false)
-      if (res?.data?.success === true) {
-        feed.replies.push(data.replies.slice(-1));
+     const updatedReply= posts.map(post=>{
+      if(post._id === feed._id){
+        return {...post, replies:[ data, ...post.replies, ]}
       }
-
+      return post
+     })
+    setposts(updatedReply) 
+	  setreplying(false)
       onClose();
-      setreply("");
     } catch (error) {
       toast({
         title: "Error",

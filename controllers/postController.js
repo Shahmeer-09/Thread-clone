@@ -9,6 +9,7 @@ const {v2:cloudinary} = require('cloudinary')
 const createPost = AsyncError(async (req, res) => {
   const newpost = { ...req.body };
   const user = await User.findById(newpost.postedBy);
+
   if (!user) throw new badReqError("User not found");
   if (user._id.toString() !== req.user._id.toString())
     throw new unauthorizedError("User not authorized to post");
@@ -21,7 +22,7 @@ const createPost = AsyncError(async (req, res) => {
 
   res
     .status(StatusCodes.OK)
-    .json(new ApiResponse(StatusCodes.OK, null, "post created successfully"));
+    .json(new ApiResponse(StatusCodes.OK, postnew, "post created successfully"));
 });
 
 const getpost = AsyncError(async (req, res) => {
@@ -81,7 +82,7 @@ const postReplies = AsyncError(async (req, res) => {
   await post.save();
   res
     .status(StatusCodes.OK)
-    .json(new ApiResponse(StatusCodes.OK, post, "post replied successfully"));
+    .json(new ApiResponse(StatusCodes.OK, reply, "post replied successfully"));
 });
 
 const feedPosts = AsyncError(async (req, res) => {

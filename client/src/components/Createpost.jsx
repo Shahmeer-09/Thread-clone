@@ -24,18 +24,22 @@ import ImagePrev from "../hooks/ImagePrev";
 import React from "react";
 import { BsFillImageFill } from "react-icons/bs";
 import customFetch from "../utils/CustomFetch";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAuthState from "../Atom/userAtom";
+import postAtom from "../Atom/postAtom";
 
 var MAX_CHARS = 500;
 const Createpost = () => {
   const authuser = useRecoilValue(userAuthState);
   const toast = useToast();
+  const imagref = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { handleprev, imageurl, setimageURl } = ImagePrev();
   const [text, setText] = useState("");
-  const imagref = useRef(null);
   const [loading , isloading] = useState(false)
+  const [posts, setposts] = useRecoilState(postAtom)
+   const regex=/^(?:http?:\/\/)?[^\/\?#]+(?<!\/post)\/([^?#]+)(?!\/post)/
+   const url = window.location.href
   const handleTextchange = async (e) => {
     const textValue = e.target.value;
     if (textValue.length <= MAX_CHARS) {
@@ -51,7 +55,6 @@ const Createpost = () => {
         text: text,
         img: imageurl,
       });
-
       if (res.data.success === false) {
         toast({
           title: "Error!.",
@@ -68,7 +71,9 @@ const Createpost = () => {
         status: "success",
         duration: 2000,
         isClosable: true,
-    });
+      });
+      const data = res?.data?.data
+       setposts([data ,...posts])
     } catch (error) {
         toast({
             title: "Error!.",
@@ -85,8 +90,10 @@ const Createpost = () => {
         setimageURl("")
     }
   };
+  
   return (
-    <>
+
+      <>
       <Button
         position={"fixed"}
         bottom={4}
@@ -148,7 +155,8 @@ const Createpost = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </>
+      </> 
+
   );
 };
 

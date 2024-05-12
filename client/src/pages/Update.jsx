@@ -35,7 +35,7 @@ export default function UpdateUser() {
        setisloading(true)
        const res = await customFetch.put(`/user/update/${userVal._id}`, {
         ...updatestate,
-        profilepic: imageurl
+        profilepic: imageurl || ""
        })
        const newdata = res.data?.data
        toast({

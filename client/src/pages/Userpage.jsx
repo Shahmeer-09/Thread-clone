@@ -6,10 +6,12 @@ import customFetch from "../utils/CustomFetch";
 import Loading from "../components/Loading";
 import Actualpost from "../components/Actualpost";
 import getUserbyname from "../hooks/getUserbyname";
+import { useRecoilState } from "recoil";
+import postAtom from "../Atom/postAtom";
 const Userpage = () => {
   const {username}= useParams()
    const {user, loading} = getUserbyname()
-  const [post, setpost] = useState([])
+  const [post, setpost] =useRecoilState(postAtom)
   const [fetchin, setFetching] = useState(false)
   const toast = useToast();
   useEffect(() => {
@@ -58,8 +60,8 @@ const Userpage = () => {
           {fetchin && <Loading/>}
           {!fetchin && post.length===0 && <h3>this user has no posts</h3> }
           {!fetchin && post.length!==0 && 
-              post.map(ps=>(
-                <Actualpost key={ps._id} feed={ps} postedBy={ps.postedBy} />
+           post.filter(po=> po.postedBy === user._id).map(ps=>(
+            <Actualpost key={ps._id} feed={ps} postedBy={ps.postedBy} />
               ))
           }
         </>

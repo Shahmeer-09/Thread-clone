@@ -5,12 +5,15 @@ import Action from "./Action";
 import { formatDistanceToNow } from "date-fns";
 import customFetch from "../utils/CustomFetch";
 import { FaTrashAlt } from "react-icons/fa";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAuthState from "../Atom/userAtom";
+import postAtom from "../Atom/postAtom";
+import { set } from "mongoose";
 const Actualpost = ({ feed, postedBy }) => {
   const navigate = useNavigate();
   const current = useRecoilValue(userAuthState);
   const toast = useToast();
+  const [post, setpost] = useRecoilState(postAtom)
   const [owner, setowner] = useState("");
   useEffect(() => {
     const getOwner = async () => {
@@ -62,6 +65,7 @@ const Actualpost = ({ feed, postedBy }) => {
         duration: 2000,
         isClosable: true,
       });
+      setpost(post.filter((item) => item._id !== feed?._id) )
     } catch (error) {
       toast({
         title: "Error!.",

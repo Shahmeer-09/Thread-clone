@@ -6,7 +6,7 @@ const Uploadoncloudinary = require("../utils/Uploadoncloudinary");
 const AsyncError = require("../utils/HocError");
 const { v2: cloudinary } = require("cloudinary");
 const { default: mongoose } = require("mongoose");
-const Post = require('../models/post.model')
+const Post = require("../models/post.model");
 const getUser = AsyncError(async (req, res) => {
   const userID = req.user._id;
   const user = await User.findById(userID).select("-password");
@@ -102,16 +102,30 @@ const updateUser = AsyncError(async (req, res) => {
   if (!user) throw new badReqError("user not found");
   if (req.params.id !== req.user._id.toString())
     throw new badReqError("you can only update your profile");
-  const profile = await Uploadoncloudinary(newUser.profilepic);
-  if (!profile) throw new badReqError("profile pic not uploaded");
-  newUser.profilepic = profile.profilepic;
-  newUser.porfilepublic = profile.public_id || "";
+  let profile
+  if (newUser.profilepic !=="") {
+   profile = await Uploadoncloudinary(newUser.profilepic);
+  }
+  newUser.profilepic = profile?.profilepic || user?.profilepic;
+  newUser.porfilepublic = profile?.public_id || user?.porfilepublic;
+
   const updatedUser = await User.findByIdAndUpdate(userid, newUser);
   if (newUser && updatedUser.porfilepublic) {
     await cloudinary.uploader.destroy(updatedUser.porfilepublic);
   }
   if (!updatedUser) throw new badReqError("user not updated");
+
   const usernew = await User.findById(userid).select("-password");
+  await Post.updateMany(
+    { "replies.userId": user._id },
+    {
+      $set: {
+        "replies.$[reply].username": usernew.username,
+        "replies.$[reply].userProfilePic": usernew.profilepic,
+      },
+    },
+    { arrayFilters: [{ "reply.userId": user._id }] }
+  );
   res
     .status(StatusCodes.OK)
     .json(
@@ -120,10 +134,10 @@ const updateUser = AsyncError(async (req, res) => {
 });
 
 const getUserprofile = AsyncError(async (req, res) => {
-  const {param} = req.params;
+  const { param } = req.params;
 
   let user;
-  if ( mongoose.Types.ObjectId.isValid(param)) {
+  if (mongoose.Types.ObjectId.isValid(param)) {
     user = await User.findOne({ _id: param }).select("-password -updatedAt");
   } else {
     user = await User.findOne({ username: param }).select(
@@ -135,14 +149,15 @@ const getUserprofile = AsyncError(async (req, res) => {
     .status(StatusCodes.OK)
     .json(new ApiResponse(StatusCodes.OK, user, "user found"));
 });
-const getPost = AsyncError(async (req, res)=>{
- 
-  const {username} = req.params
-  const user = await User.findOne({username})
-  if(!user) throw new badReqError("User not found")
-    const posts = await Post.find({postedBy:user._id}).sort("-createdAt")
-    res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, posts, "posts retrieved"))
-})
+const getPost = AsyncError(async (req, res) => {
+  const { username } = req.params;
+  const user = await User.findOne({ username });
+  if (!user) throw new badReqError("User not found");
+  const posts = await Post.find({ postedBy: user._id }).sort("-createdAt");
+  res
+    .status(StatusCodes.OK)
+    .json(new ApiResponse(StatusCodes.OK, posts, "posts retrieved"));
+});
 module.exports = {
   signup,
   login,
@@ -151,6 +166,5 @@ module.exports = {
   updateUser,
   getUserprofile,
   getUser,
-  getPost
+  getPost,
 };
-
