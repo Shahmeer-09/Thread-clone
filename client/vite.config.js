@@ -7,7 +7,7 @@ export default defineConfig({
   server:{
     proxy:{
       '/thread':{
-        target:'http://localhost:5100',
+        target:'https://thread-clone-flame-mu.vercel.app',
         changeOrigin:true,
         secure:false,
       }
