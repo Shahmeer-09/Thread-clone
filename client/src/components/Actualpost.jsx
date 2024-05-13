@@ -140,7 +140,7 @@ const Actualpost = ({ feed, postedBy }) => {
               >
                 {owner.name}
               </Text>
-              <Image src="/verified.png" w={4} h={4} ml={1} />
+              <Image src="/verified.png" w={4} h={4} ml={1} objectFit={"cover"} objectPosition={"center"} />
             </Flex>
             <Flex gap={4} alignItems={"center"} mr={2}>
               <Text

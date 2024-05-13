@@ -31,8 +31,8 @@ const navigate = useNavigate()
   const setauthScreen = useSetRecoilState(authScreen);
   const setuser  = useSetRecoilState(userAuthState)
   const [formState, setFormState] = useState({
-    username: "",
-    password: "",
+    username: "hassan01",
+    password: "hassan1234",
   });
 
   const handleSubmit = async () => {
@@ -95,7 +95,9 @@ const navigate = useNavigate()
                     ...formState,
                     username: e.target.value,
                   });
+
                 }}
+                defaultValue={formState.username}
               />
             </FormControl>
             <FormControl isRequired>
@@ -109,7 +111,9 @@ const navigate = useNavigate()
                       password: e.target.value,
                     });
                   }}
+                  defaultValue={formState.password}
                 />
+
                 <InputRightElement h={"full"}>
                   <Button
                     variant={"ghost"}
