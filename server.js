@@ -18,7 +18,7 @@ app.use("/thread/post", require("./Routes/post.route"));
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "./client/dist", "index.html"));
 })
-app.get("*", (req, res) => {
+app.use("*", (req, res) => {
   res.status(StatusCodes.NOT_FOUND).json("route not found");
 });
 app.use(errorManager);
